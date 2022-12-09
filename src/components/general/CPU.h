@@ -31,6 +31,9 @@ private:
     unsigned short sp = 0; // Stack Pointer
     unsigned short pc = 0; // Program counter
 
+    // flags
+    unsigned char ime = 1; // Interrupt master enable flag
+
     // other
     const double cycleTime = 238.418579102; // Google calculator result for clock speed might be inaccurate
 

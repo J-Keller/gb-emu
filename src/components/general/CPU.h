@@ -6,15 +6,22 @@
 #define GB_EMU_CPU_H
 
 
+#include <stack>
 #include "../video/Display.h"
 
 class CPU {
 public:
     CPU();
+
+    void run();
+
 private:
+    // components
     Display display;
 
     unsigned char bootRom[0x100] = {};
+    std::stack<unsigned short> stack;
+
 
     // registers
     unsigned short af = 0; // Accumulator & Flags
@@ -23,6 +30,13 @@ private:
     unsigned short hl = 0;
     unsigned short sp = 0; // Stack Pointer
     unsigned short pc = 0; // Program counter
+
+    // other
+    const double cycleTime = 238.418579102; // Google calculator result for clock speed might be inaccurate
+
+    // functions
+    unsigned char executeInstruction();
+    void waitCycles(double cycles, double offset);
 };
 
 

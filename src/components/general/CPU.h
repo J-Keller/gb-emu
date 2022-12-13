@@ -38,8 +38,15 @@ private:
 
     // other
     const double cycleTime = 238.418579102; // Google calculator result for clock speed might be inaccurate
+    enum BytePosition {
+        LOW,
+        HIGH,
+    };
 
     // functions
+    static unsigned char readRegister(unsigned short reg, BytePosition bytePos);
+    static void writeRegister(unsigned short &reg, unsigned char value, BytePosition bytePos);
+
     unsigned char executeInstruction();
     void waitCycles(double cycles, double offset) const;
     unsigned char readByteFromMemory(unsigned short address);

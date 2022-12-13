@@ -29,6 +29,30 @@ void CPU::run() {
     }
 }
 
+unsigned char CPU::readRegister(unsigned short reg, BytePosition bytePos) {
+    switch (bytePos) {
+        case LOW:
+            // return low byte from register
+            return reg & 0x00FF;
+        case HIGH:
+            // return high byte from register
+            return reg >> 8;
+    }
+}
+
+void CPU::writeRegister(unsigned short &reg, unsigned char value, BytePosition bytePos) {
+    switch (bytePos) {
+        case LOW:
+            // write to low byte from register
+            reg = (reg & 0xFF00) | value;
+            break;
+        case HIGH:
+            // write to high byte from register
+            reg = (value << 8) | (reg & 0x00FF);
+            break;
+    }
+}
+
 void CPU::waitCycles(double cycles, double offset) const {
     std::this_thread::sleep_for(std::chrono::nanoseconds((int)((cycles * cycleTime) - offset)));
 }
@@ -72,22 +96,22 @@ unsigned char CPU::executeInstruction() {
     // 8 bit load instructions
     switch (instruction8Bit) {
         case 0x3A: // ldd A,(HL)
-            af = (readByteFromMemory(hl--) << 8) | (af & 0x00FF);
+            writeRegister(af, readByteFromMemory(hl--), HIGH);
             return 8;
         case 0x32: // ldd (HL),A
-            writeByteToMemory(af >> 8, hl--);
+            writeByteToMemory(readRegister(af, HIGH), hl--);
             return 8;
         case 0x2A: // ldi A,(HL)
-            af = (readByteFromMemory(hl++) << 8) | (af & 0x00FF);
+            writeRegister(af, readByteFromMemory(hl++), HIGH);
             return 8;
         case 0x22: // ldi (HL),A
-            writeByteToMemory(af >> 8, hl++);
+            writeByteToMemory(readRegister(af, HIGH), hl++);
             return 8;
         case 0xE2: // ld (FF00+C),A
-            // TODO: write to io-port C (memory FF00+C)
+            writeByteToMemory(readRegister(af, HIGH), 0xFF00 | readRegister(bc, LOW));
             return 8;
         case 0xF2: // ld A,(FF00+C)
-            // TODO: read from io-port C (memory FF00+C)
+            writeRegister(af, readByteFromMemory(0xFF00 | readRegister(bc, LOW)), HIGH);
             return 8;
         case 0xE0: // ld (FF00+n),A
             // TODO: read next byte as n

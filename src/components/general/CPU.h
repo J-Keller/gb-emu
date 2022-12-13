@@ -8,6 +8,7 @@
 
 #include <stack>
 #include "../video/Display.h"
+#include "Memory.h"
 
 class CPU {
 public:
@@ -18,6 +19,7 @@ public:
 private:
     // components
     Display display;
+    Memory memory;
 
     unsigned char bootRom[0x100] = {};
     std::stack<unsigned short> stack;

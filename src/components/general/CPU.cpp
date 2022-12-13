@@ -34,11 +34,11 @@ void CPU::waitCycles(double cycles, double offset) const {
 }
 
 unsigned char CPU::readByteFromMemory(unsigned short address) {
-    return bootRom[address]; // TODO read from actual memory
+    return memory.readByte(address);
 }
 
 void CPU::writeByteToMemory(unsigned char value, unsigned short address) {
-    // TODO
+    memory.writeByte(value, address);
 }
 
 unsigned char CPU::executeInstruction() {

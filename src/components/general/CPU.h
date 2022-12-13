@@ -39,7 +39,9 @@ private:
 
     // functions
     unsigned char executeInstruction();
-    void waitCycles(double cycles, double offset);
+    void waitCycles(double cycles, double offset) const;
+    unsigned char readByteFromMemory(unsigned short address);
+    void writeByteToMemory(unsigned char value, unsigned short address);
 };
 
 

@@ -19,8 +19,9 @@ CPU::CPU() {
 void CPU::run() {
     while(true) {
         std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-        auto cycles = executeInstruction();
+        unsigned char cycles = executeInstruction();
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+        // TODO: Check type
         unsigned int delta = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
         std::cout << delta << std::endl;
         waitCycles(cycles, delta);
@@ -28,8 +29,16 @@ void CPU::run() {
     }
 }
 
-void CPU::waitCycles(double cycles, double offset) {
+void CPU::waitCycles(double cycles, double offset) const {
     std::this_thread::sleep_for(std::chrono::nanoseconds((int)((cycles * cycleTime) - offset)));
+}
+
+unsigned char CPU::readByteFromMemory(unsigned short address) {
+    return bootRom[address]; // TODO read from actual memory
+}
+
+void CPU::writeByteToMemory(unsigned char value, unsigned short address) {
+    // TODO
 }
 
 unsigned char CPU::executeInstruction() {
@@ -39,35 +48,57 @@ unsigned char CPU::executeInstruction() {
 
     // CPU control instructions
     switch (instruction8Bit) {
-        case 0x00:
+        case 0x00: // nop
             return 4; // no operation -> takes 4 cpu cycles
-        case 0x76:
-            // halt -> until interrupt
-            break;
-        case 0x10:
-            // stop -> validate next 8 bits are 0x00
-            break;
-        case 0xF3:
-            ime = 0; // di -> disable interrupts
-            break;
-        case 0xFB:
-            ime = 1; // ei -> enable interrupts
-            break;
-        case 0xCB:
-            // prefix cb -> execute from cb instruction set
-            break;
+        case 0x76: // halt
+            // TODO: halt
+            return 4;
+        case 0x10: // stop
+            // TODO: validate next 8 bits are 0x00
+            return 4;
+        case 0xF3: // di -> disable interrupts
+            ime = 0;
+            return 4;
+        case 0xFB: // ei -> enable interrupts
+            ime = 1;
+            return 4;
+        case 0xCB: // prefix cb -> execute from cb instruction set
+            // TODO: cb instructions
+            return 4;
         default:
             break;
     }
 
-    unsigned char leftNibble = (instruction8Bit >> 4) & 0x0F;
-    unsigned char rightNibble = instruction8Bit & 0x0F;
-
-    if (leftNibble >= 0x4 && leftNibble <= 0x7) {
-        // load instruction
-    }
-    if (leftNibble >= 0x8 && leftNibble <= 0xB) {
-        // arithmetic instruction
+    // 8 bit load instructions
+    switch (instruction8Bit) {
+        case 0x3A: // ldd A,(HL)
+            af = (readByteFromMemory(hl--) << 8) | (af & 0x00FF);
+            return 8;
+        case 0x32: // ldd (HL),A
+            writeByteToMemory(af >> 8, hl--);
+            return 8;
+        case 0x2A: // ldi A,(HL)
+            af = (readByteFromMemory(hl++) << 8) | (af & 0x00FF);
+            return 8;
+        case 0x22: // ldi (HL),A
+            writeByteToMemory(af >> 8, hl++);
+            return 8;
+        case 0xE2: // ld (FF00+C),A
+            // TODO: write to io-port C (memory FF00+C)
+            return 8;
+        case 0xF2: // ld A,(FF00+C)
+            // TODO: read from io-port C (memory FF00+C)
+            return 8;
+        case 0xE0: // ld (FF00+n),A
+            // TODO: read next byte as n
+            // TODO: write to io-port n (memory FF00+n)
+            return 12;
+        case 0xF0: // ld A,(FF00+n)
+            // TODO: read next byte as n
+            // TODO: read from io-port n (memory FF00+n)
+            return 12;
+        default:
+            break;
     }
 
     // TODO: CB instructions

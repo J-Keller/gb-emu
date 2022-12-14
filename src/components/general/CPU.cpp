@@ -58,6 +58,32 @@ void CPU::writeRegister(unsigned short &reg, unsigned char value, BytePosition b
     }
 }
 
+bool CPU::readFlag(Flag flag) const {
+    switch (flag) {
+        case Z:
+            return (af >> 7) & 1;
+        case N:
+            return (af >> 6) & 1;
+        case H:
+            return (af >> 5) & 1;
+        case C:
+            return (af >> 4) & 1;
+    }
+}
+
+void CPU::writeFlag(Flag flag, bool value) {
+    switch (flag) {
+        case Z:
+            af |= 1 << 7;
+        case N:
+            af |= 1 << 6;
+        case H:
+            af |= 1 << 5;
+        case C:
+            af |= 1 << 4;
+    }
+}
+
 void CPU::waitCycles(double cycles, double offset) const {
     std::this_thread::sleep_for(std::chrono::nanoseconds((int)((cycles * cycleTime) - offset)));
 }
@@ -98,6 +124,11 @@ signed char CPU::readImmediate8BitSignedData(unsigned short &programCounter) {
 }
 
 unsigned char CPU::executeInstruction() {
+    // initialize variables needed in instructions later in switch statement
+    unsigned char result; // result of arithmetic instruction before it is saved to register
+    unsigned char tmp1; // one side of arithmetic function
+    unsigned char tmp2; // one side of arithmetic function
+
     // TODO: I didn't even start yet but this needs optimization later
     unsigned char instruction = readInstruction(pc);
     std::cout << std::setw(2) << std::setfill('0') << std::hex << +instruction << std::endl;
@@ -639,9 +670,10 @@ unsigned char CPU::executeInstruction() {
         case 0xAE:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::hex << +instruction << " not implemented yet";
             return 0;
-        case 0xAF:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0xAF: // xor A
+            writeRegister(af, 0, HIGH); // TODO: check if it is really always 0
+            writeFlag(Z, true);
+            return 4;
 
         case 0xB0:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::hex << +instruction << " not implemented yet";

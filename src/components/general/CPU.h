@@ -42,10 +42,18 @@ private:
         LOW,
         HIGH,
     };
+    enum Flag {
+        Z,
+        N,
+        H,
+        C,
+    };
 
     // functions
     static unsigned char readRegister(unsigned short reg, BytePosition bytePos);
     static void writeRegister(unsigned short &reg, unsigned char value, BytePosition bytePos);
+    bool readFlag(Flag flag) const;
+    void writeFlag(Flag flag, bool value);
 
     unsigned char executeInstruction();
     void waitCycles(double cycles, double offset) const;

@@ -65,10 +65,28 @@ void CPU::writeByteToMemory(unsigned char value, unsigned short address) {
     memory.writeByte(value, address);
 }
 
+unsigned char CPU::readInstruction(unsigned short &programCounter) {
+    unsigned char instruction;
+    if (programCounter < 0x100) {
+        // read from boot rom
+        instruction = bootRom[programCounter];
+    } else {
+        instruction = memory.readByte(programCounter);
+    }
+    programCounter++;
+    return instruction;
+}
+
 unsigned char CPU::executeInstruction() {
     // TODO: I didn't even start yet but this needs optimization later
-    // stick to boot rom for now
-    unsigned char instruction8Bit = bootRom[pc];
+
+    // pre initialize variables that might be used in instructions (second / third byte)
+    unsigned char n1;
+    unsigned char n2;
+    unsigned short nn;
+    signed char d1;
+
+    unsigned char instruction8Bit = readInstruction(pc);
 
     // CPU control instructions
     switch (instruction8Bit) {
@@ -78,7 +96,10 @@ unsigned char CPU::executeInstruction() {
             // TODO: halt
             return 4;
         case 0x10: // stop
-            // TODO: validate next 8 bits are 0x00
+            if (readInstruction(pc) != 0x00) {
+                std::cerr << "Invalid STOP instruction" << std::endl;
+                // TODO: throw exception
+            }
             return 4;
         case 0xF3: // di -> disable interrupts
             ime = 0;
@@ -114,12 +135,38 @@ unsigned char CPU::executeInstruction() {
             writeRegister(af, readByteFromMemory(0xFF00 | readRegister(bc, LOW)), HIGH);
             return 8;
         case 0xE0: // ld (FF00+n),A
-            // TODO: read next byte as n
-            // TODO: write to io-port n (memory FF00+n)
+            n1 = readInstruction(pc);
+            writeByteToMemory(readRegister(af, HIGH), 0xFF00 | n1);
             return 12;
         case 0xF0: // ld A,(FF00+n)
-            // TODO: read next byte as n
-            // TODO: read from io-port n (memory FF00+n)
+            n1 = readInstruction(pc);
+            writeRegister(af, readByteFromMemory(0xFF00 | n1), HIGH);
+            return 12;
+        case 0xEA: // ld (nn),A
+            n1 = readInstruction(pc);
+            n2 = readInstruction(pc);
+            nn = (n1 << 8) | n2;
+            writeByteToMemory(readRegister(af, HIGH), nn);
+            return 16;
+        case 0x12: // ld (DE),A
+            writeByteToMemory(readRegister(af, HIGH), de);
+            return 8;
+        case 0x02:// ld (BC),A
+            writeByteToMemory(readRegister(af, HIGH), bc);
+            return 8;
+        case 0xFA: // ld A,(nn)
+            n1 = readInstruction(pc);
+            n2 = readInstruction(pc);
+            nn = (n1 << 8) | n2;
+            writeRegister(af, readByteFromMemory(nn), HIGH);
+            return 16;
+        case 0x1A: // ld A,(DE)
+            writeRegister(af, readByteFromMemory(de), HIGH);
+            return 8;
+        case 0x0A: // ld A,(BC)
+            writeRegister(af, readByteFromMemory(bc), HIGH);
+            return 8;
+        case 0x36: // ld (HL),n
             return 12;
         default:
             break;

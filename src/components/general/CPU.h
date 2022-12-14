@@ -51,6 +51,7 @@ private:
     void waitCycles(double cycles, double offset) const;
     unsigned char readByteFromMemory(unsigned short address);
     void writeByteToMemory(unsigned char value, unsigned short address);
+    unsigned char readInstruction(unsigned short &programCounter);
 };
 
 

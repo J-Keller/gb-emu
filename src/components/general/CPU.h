@@ -52,6 +52,11 @@ private:
     unsigned char readByteFromMemory(unsigned short address);
     void writeByteToMemory(unsigned char value, unsigned short address);
     unsigned char readInstruction(unsigned short &programCounter);
+
+    // TODO: maybe use templates or something
+    unsigned char readImmediate8BitData(unsigned short &programCounter);
+    unsigned short readImmediate16BitData(unsigned short &programCounter);
+    signed char readImmediate8BitSignedData(unsigned short &programCounter);
 };
 
 

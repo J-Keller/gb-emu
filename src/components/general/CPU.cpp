@@ -131,7 +131,7 @@ unsigned char CPU::executeInstruction() {
 
     // TODO: I didn't even start yet but this needs optimization later
     unsigned char instruction = readInstruction(pc);
-    std::cout << std::setw(2) << std::setfill('0') << std::hex << +instruction << std::endl;
+    // std::cout << std::setw(2) << std::setfill('0') << std::hex << +instruction << std::endl;
 
     switch(instruction) {
         case 0x00: // nop
@@ -234,12 +234,15 @@ unsigned char CPU::executeInstruction() {
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::hex << +instruction << " not implemented yet";
             return 0;
 
-        case 0x20:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::hex << +instruction << " not implemented yet";
-            return 0;
-        case 0x21:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0x20: // jr NZ,r8
+            if (readFlag(N) && readFlag(Z)) {
+                pc += readImmediate8BitSignedData(pc);
+                return 12;
+            }
+            return 8;
+        case 0x21: // ld hl,d16
+            hl = readImmediate16BitData(pc);
+            return 12;
         case 0x22: // ldi (HL),A
             writeByteToMemory(readRegister(af, HIGH), hl++);
             return 8;
@@ -514,9 +517,9 @@ unsigned char CPU::executeInstruction() {
         case 0x7B:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::hex << +instruction << " not implemented yet";
             return 0;
-        case 0x7C:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0x7C: // ld A,H
+            writeRegister(af, readRegister(hl, HIGH), HIGH);
+            return 4;
         case 0x7D:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::hex << +instruction << " not implemented yet";
             return 0;

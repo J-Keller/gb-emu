@@ -6,6 +6,7 @@
 #define GB_EMU_DISPLAY_H
 
 #include <SDL.h>
+#include <ncurses.h>
 
 class Display {
 public:
@@ -13,7 +14,20 @@ public:
     ~Display();
 
     void printScreen();
+
+#ifdef DEBUG
+    void printDebugInfo(unsigned short* registers, unsigned char* memory, unsigned short pc);
+#endif
 private:
+
+#ifdef DEBUG
+    void initDebugStuff();
+
+    // Debug Stuff
+    WINDOW *registerWindow;
+    WINDOW *pcWindow;
+#endif
+
     SDL_Window *window;
     SDL_Renderer *renderer;
 

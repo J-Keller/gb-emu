@@ -124,6 +124,10 @@ signed char CPU::readImmediate8BitSignedData(unsigned short &programCounter) {
 }
 
 unsigned char CPU::executeInstruction() {
+    display.printScreen();
+    unsigned short registers[6] = {af, bc, de, hl, sp, pc};
+    display.printDebugInfo(registers, bootRom, pc);
+
     // initialize variables needed in instructions later in switch statement
     unsigned char result; // result of arithmetic instruction before it is saved to register
     unsigned char tmp1; // one side of arithmetic function

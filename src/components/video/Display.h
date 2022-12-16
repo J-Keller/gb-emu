@@ -16,7 +16,7 @@ public:
     void printScreen();
 
 #ifdef DEBUG
-    void printDebugInfo(unsigned short* registers, unsigned char* memory, unsigned short pc);
+    void printDebugInfo(uint16_t* registers, uint8_t* memory, uint16_t pc);
 #endif
 private:
 
@@ -31,10 +31,10 @@ private:
     SDL_Window *window;
     SDL_Renderer *renderer;
 
-    unsigned short width = 160;
-    unsigned short height = 144;
+    uint16_t width = 160;
+    uint16_t height = 144;
     // TODO: add setting
-    unsigned char scale = 3;
+    uint8_t scale = 3;
 };
 
 

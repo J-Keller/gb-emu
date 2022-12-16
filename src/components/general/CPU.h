@@ -21,20 +21,20 @@ private:
     Display display;
     Memory memory;
 
-    unsigned char bootRom[0x100] = {};
-    std::stack<unsigned short> stack;
+    uint8_t bootRom[0x100] = {};
+    std::stack<uint16_t> stack;
 
 
     // registers
-    unsigned short af = 0; // Accumulator & Flags
-    unsigned short bc = 0;
-    unsigned short de = 0;
-    unsigned short hl = 0;
-    unsigned short sp = 0; // Stack Pointer
-    unsigned short pc = 0; // Program counter
+    uint16_t af = 0; // Accumulator & Flags
+    uint16_t bc = 0;
+    uint16_t de = 0;
+    uint16_t hl = 0;
+    uint16_t sp = 0; // Stack Pointer
+    uint16_t pc = 0; // Program counter
 
     // flags
-    unsigned char ime = 1; // Interrupt master enable flag
+    uint8_t ime = 1; // Interrupt master enable flag
 
     // other
     const double cycleTime = 238.418579102; // Google calculator result for clock speed might be inaccurate
@@ -50,21 +50,21 @@ private:
     };
 
     // functions
-    static unsigned char readRegister(unsigned short reg, BytePosition bytePos);
-    static void writeRegister(unsigned short &reg, unsigned char value, BytePosition bytePos);
+    static uint8_t readRegister(uint16_t reg, BytePosition bytePos);
+    static void writeRegister(uint16_t &reg, uint8_t value, BytePosition bytePos);
     bool readFlag(Flag flag) const;
     void writeFlag(Flag flag, bool value);
 
-    unsigned char executeInstruction();
+    uint8_t executeInstruction();
     void waitCycles(double cycles, double offset) const;
-    unsigned char readByteFromMemory(unsigned short address);
-    void writeByteToMemory(unsigned char value, unsigned short address);
-    unsigned char readInstruction(unsigned short &programCounter);
+    uint8_t readByteFromMemory(uint16_t address);
+    void writeByteToMemory(uint8_t value, uint16_t address);
+    uint8_t readInstruction(uint16_t &programCounter);
 
     // TODO: maybe use templates or something
-    unsigned char readImmediate8BitData(unsigned short &programCounter);
-    unsigned short readImmediate16BitData(unsigned short &programCounter);
-    signed char readImmediate8BitSignedData(unsigned short &programCounter);
+    uint8_t readImmediate8BitData(uint16_t &programCounter);
+    uint16_t readImmediate16BitData(uint16_t &programCounter);
+    int8_t readImmediate8BitSignedData(uint16_t &programCounter);
 };
 
 

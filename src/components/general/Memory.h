@@ -11,12 +11,12 @@
 
 class Memory {
 public:
-    void write(std::vector<unsigned char> buffer, unsigned short startAddress);
-    unsigned char readByte(unsigned short address);
-    void writeByte(unsigned char value, unsigned short address);
+    void write(std::vector<uint8_t> buffer, uint16_t startAddress);
+    uint8_t readByte(uint16_t address);
+    void writeByte(uint8_t value, uint16_t address);
 protected:
 private:
-    unsigned char ram[65536] = {};
+    uint8_t ram[65536] = {};
 };
 
 

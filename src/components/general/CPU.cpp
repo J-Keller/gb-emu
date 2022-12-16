@@ -13,14 +13,23 @@
 
 CPU::CPU() {
     std::ifstream program("../roms/dmg_boot.bin", std::ios::binary);
-    std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(program), {});
+    std::vector<uint8_t> buffer(std::istreambuf_iterator<char>(program), {});
     std::copy(buffer.begin(), buffer.end(), std::begin(bootRom));
 }
 
 void CPU::run() {
     while(true) {
+        // TODO: move this
+        SDL_Event event;
+        while(SDL_PollEvent(&event)) {
+            switch(event.type) {
+                case SDL_QUIT:
+                    return;
+            }
+        }
+
         std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-        unsigned char cycles = executeInstruction();
+        uint8_t cycles = executeInstruction();
         if (cycles == 0) {
             // invalid / unimplemented instruction
             return;
@@ -34,7 +43,7 @@ void CPU::run() {
     }
 }
 
-unsigned char CPU::readRegister(unsigned short reg, BytePosition bytePos) {
+uint8_t CPU::readRegister(uint16_t reg, BytePosition bytePos) {
     switch (bytePos) {
         case LOW:
             // return low byte from register
@@ -42,10 +51,12 @@ unsigned char CPU::readRegister(unsigned short reg, BytePosition bytePos) {
         case HIGH:
             // return high byte from register
             return reg >> 8;
+        default:
+            return 0;
     }
 }
 
-void CPU::writeRegister(unsigned short &reg, unsigned char value, BytePosition bytePos) {
+void CPU::writeRegister(uint16_t &reg, uint8_t value, BytePosition bytePos) {
     switch (bytePos) {
         case LOW:
             // write to low byte from register
@@ -68,6 +79,8 @@ bool CPU::readFlag(Flag flag) const {
             return (af >> 5) & 1;
         case C:
             return (af >> 4) & 1;
+        default:
+            return false;
     }
 }
 
@@ -88,16 +101,16 @@ void CPU::waitCycles(double cycles, double offset) const {
     std::this_thread::sleep_for(std::chrono::nanoseconds((int)((cycles * cycleTime) - offset)));
 }
 
-unsigned char CPU::readByteFromMemory(unsigned short address) {
+uint8_t CPU::readByteFromMemory(uint16_t address) {
     return memory.readByte(address);
 }
 
-void CPU::writeByteToMemory(unsigned char value, unsigned short address) {
+void CPU::writeByteToMemory(uint8_t value, uint16_t address) {
     memory.writeByte(value, address);
 }
 
-unsigned char CPU::readInstruction(unsigned short &programCounter) {
-    unsigned char instruction;
+uint8_t CPU::readInstruction(uint16_t &programCounter) {
+    uint8_t instruction;
     if (programCounter < 0x100) {
         // read from boot rom
         instruction = bootRom[programCounter];
@@ -108,34 +121,35 @@ unsigned char CPU::readInstruction(unsigned short &programCounter) {
     return instruction;
 }
 
-unsigned char CPU::readImmediate8BitData(unsigned short &programCounter) {
+uint8_t CPU::readImmediate8BitData(uint16_t &programCounter) {
     return readInstruction(programCounter);
 }
 
-unsigned short CPU::readImmediate16BitData(unsigned short &programCounter) {
-    unsigned short a = readInstruction(programCounter);
-    unsigned char b = readInstruction(programCounter);
+uint16_t CPU::readImmediate16BitData(uint16_t &programCounter) {
+    uint16_t a = readInstruction(programCounter);
+    uint8_t b = readInstruction(programCounter);
     return (a << 8) | b;
 }
 
 // TODO: check if signed returns cause problems with unsigned readInstruction
-signed char CPU::readImmediate8BitSignedData(unsigned short &programCounter) {
+int8_t CPU::readImmediate8BitSignedData(uint16_t &programCounter) {
     return readInstruction(programCounter);
 }
 
-unsigned char CPU::executeInstruction() {
+uint8_t CPU::executeInstruction() {
     display.printScreen();
-    unsigned short registers[6] = {af, bc, de, hl, sp, pc};
+    uint16_t registers[6] = {af, bc, de, hl, sp, pc};
+#ifdef DEBUG
     display.printDebugInfo(registers, bootRom, pc);
-
+#endif
     // initialize variables needed in instructions later in switch statement
-    unsigned char result; // result of arithmetic instruction before it is saved to register
-    unsigned char tmp1; // one side of arithmetic function
-    unsigned char tmp2; // one side of arithmetic function
+    uint8_t result; // result of arithmetic instruction before it is saved to register
+    uint8_t tmp1; // one side of arithmetic function
+    uint8_t tmp2; // one side of arithmetic function
 
     // TODO: I didn't even start yet but this needs optimization later
-    unsigned char instruction = readInstruction(pc);
-    // std::cout << std::setw(2) << std::setfill('0') << std::hex << +instruction << std::endl;
+    uint8_t instruction = readInstruction(pc);
+    std::cout << std::setw(2) << std::setfill('0') << std::hex << +instruction << std::endl;
 
     switch(instruction) {
         case 0x00: // nop

@@ -28,25 +28,25 @@ void destroyWindow(WINDOW *window) {
 
 void Display::initDebugStuff() {
     // registers
-    unsigned char registerWindowWidth = 19;
-    unsigned char registerWindowHeight = 10;
-    unsigned char registerWindowXPos = 1;
-    unsigned char registerWindowYPos = 1;
+    uint8_t registerWindowWidth = 19;
+    uint8_t registerWindowHeight = 10;
+    uint8_t registerWindowXPos = 1;
+    uint8_t registerWindowYPos = 1;
 
     registerWindow = createNewWindow(registerWindowWidth, registerWindowHeight, registerWindowXPos, registerWindowYPos);
 
     // pc
-    unsigned char pcWindowWidth = 19;
-    unsigned char pcWindowHeight = 56;
-    unsigned char pcWindowXPos = 1;
-    unsigned char pcWindowYPos = 11;
+    uint8_t pcWindowWidth = 19;
+    uint8_t pcWindowHeight = 56;
+    uint8_t pcWindowXPos = 1;
+    uint8_t pcWindowYPos = 11;
 
     pcWindow = createNewWindow(pcWindowWidth, pcWindowHeight, pcWindowXPos, pcWindowYPos);
 
     // TODO: stack
 }
 
-void Display::printDebugInfo(unsigned short *registers, unsigned char* memory, unsigned short pc) {
+void Display::printDebugInfo(uint16_t *registers, uint8_t* memory, uint16_t pc) {
     // registers
     mvwprintw(registerWindow, 0, 0, "registers");
     mvwprintw(registerWindow, 1, 1, "AF: 0x%.4X", registers[0]);

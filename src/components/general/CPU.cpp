@@ -97,6 +97,21 @@ void CPU::writeFlag(Flag flag, bool value) {
     }
 }
 
+void CPU::checkBit(uint8_t bit, uint8_t valueToCheck) {
+    if (bit > 7) {
+        return;
+    }
+
+    if ((valueToCheck >> bit) & 1) {
+        writeFlag(Z, true);
+    } else {
+        writeFlag(Z, false);
+    }
+
+    writeFlag(N, false);
+    writeFlag(H, true);
+}
+
 void CPU::waitCycles(double cycles, double offset) const {
     std::this_thread::sleep_for(std::chrono::nanoseconds((int)((cycles * cycleTime) - offset)));
 }
@@ -1337,9 +1352,9 @@ uint8_t CPU::executeCBInstruction() {
         case 0x7B:
             std::cerr << "Instruction 0xCB " << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
-        case 0x7C:
-            std::cerr << "Instruction 0xCB " << std::setw(2) << std::setfill('0') << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0x7C: // bit 7,H
+            checkBit(7, readRegister(hl, HIGH));
+            return 8;
         case 0x7D:
             std::cerr << "Instruction 0xCB " << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;

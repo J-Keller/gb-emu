@@ -49,12 +49,14 @@ private:
         C,
     };
 
-    // functions
+    // helper functions
     static uint8_t readRegister(uint16_t reg, BytePosition bytePos);
     static void writeRegister(uint16_t &reg, uint8_t value, BytePosition bytePos);
     bool readFlag(Flag flag) const;
     void writeFlag(Flag flag, bool value);
+    void checkBit(uint8_t bit, uint8_t valueToCheck);
 
+    // cpu functions
     uint8_t executeInstruction();
     uint8_t executeCBInstruction();
     void waitCycles(double cycles, double offset) const;

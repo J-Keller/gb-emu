@@ -27,6 +27,18 @@ void CPU::run() {
                     return;
             }
         }
+#ifdef STEP_MODE
+        for (int i = 0; i < 1;) {
+            while(SDL_PollEvent(&event)) {
+                switch(event.type) {
+                    case SDL_KEYDOWN:
+                        if (event.key.keysym.scancode == SDL_SCANCODE_L) {
+                            i = 1;
+                        }
+                }
+            }
+        }
+#endif
 
         std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
         uint8_t cycles = executeInstruction();
@@ -164,7 +176,9 @@ uint8_t CPU::executeInstruction() {
 
     // TODO: I didn't even start yet but this needs optimization later
     uint8_t instruction = readInstruction(pc);
-    std::cout << std::setw(2) << std::setfill('0') << std::uppercase << std::uppercase << std::hex << +instruction << std::endl;
+    if (instruction != 0xCB) {
+        //std::cout << std::setw(2) << std::setfill('0') << std::uppercase << std::uppercase << std::hex << +instruction << std::endl;
+    }
 
     switch(instruction) {
         case 0x00: // nop
@@ -970,7 +984,7 @@ uint8_t CPU::executeCBInstruction() {
 
     // TODO: I didn't even start yet but this needs optimization later
     uint8_t instruction = readInstruction(pc);
-    std::cout << "CB " << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << std::endl;
+    //std::cout << "CB " << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << std::endl;
 
     switch(instruction) {
         case 0x00:
@@ -1354,7 +1368,7 @@ uint8_t CPU::executeCBInstruction() {
             return 0;
         case 0x7C: // bit 7,H
             checkBit(7, readRegister(hl, HIGH));
-            return 8;
+            return 0;
         case 0x7D:
             std::cerr << "Instruction 0xCB " << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;

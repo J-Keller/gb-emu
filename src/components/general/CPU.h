@@ -56,6 +56,7 @@ private:
     void writeFlag(Flag flag, bool value);
 
     uint8_t executeInstruction();
+    uint8_t executeCBInstruction();
     void waitCycles(double cycles, double offset) const;
     uint8_t readByteFromMemory(uint16_t address);
     void writeByteToMemory(uint8_t value, uint16_t address);

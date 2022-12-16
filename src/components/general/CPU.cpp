@@ -99,13 +99,17 @@ bool CPU::readFlag(Flag flag) const {
 void CPU::writeFlag(Flag flag, bool value) {
     switch (flag) {
         case Z:
-            af |= 1 << 7;
+            af |= value << 7;
+            break;
         case N:
-            af |= 1 << 6;
+            af |= value << 6;
+            break;
         case H:
-            af |= 1 << 5;
+            af |= value << 5;
+            break;
         case C:
-            af |= 1 << 4;
+            af |= value << 4;
+            break;
     }
 }
 

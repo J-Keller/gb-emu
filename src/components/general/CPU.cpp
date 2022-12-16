@@ -1368,7 +1368,7 @@ uint8_t CPU::executeCBInstruction() {
             return 0;
         case 0x7C: // bit 7,H
             checkBit(7, readRegister(hl, HIGH));
-            return 0;
+            return 8;
         case 0x7D:
             std::cerr << "Instruction 0xCB " << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;

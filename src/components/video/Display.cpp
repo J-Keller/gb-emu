@@ -28,8 +28,8 @@ void destroyWindow(WINDOW *window) {
 
 void Display::initDebugStuff() {
     // registers
-    uint8_t registerWindowWidth = 19;
-    uint8_t registerWindowHeight = 10;
+    uint8_t registerWindowWidth = 18;
+    uint8_t registerWindowHeight = 8;
     uint8_t registerWindowXPos = 1;
     uint8_t registerWindowYPos = 1;
 
@@ -37,9 +37,9 @@ void Display::initDebugStuff() {
 
     // pc
     uint8_t pcWindowWidth = 19;
-    uint8_t pcWindowHeight = 56;
+    uint8_t pcWindowHeight = 3;
     uint8_t pcWindowXPos = 1;
-    uint8_t pcWindowYPos = 11;
+    uint8_t pcWindowYPos = 9;
 
     pcWindow = createNewWindow(pcWindowWidth, pcWindowHeight, pcWindowXPos, pcWindowYPos);
 
@@ -47,24 +47,25 @@ void Display::initDebugStuff() {
 }
 
 void Display::printDebugInfo(uint16_t *registers, uint8_t* memory, uint16_t pc) {
-    // registers
+    // registers & flags
     mvwprintw(registerWindow, 0, 0, "registers");
+    // registers
     mvwprintw(registerWindow, 1, 1, "AF: 0x%.4X", registers[0]);
     mvwprintw(registerWindow, 2, 1, "BC: 0x%.4X", registers[1]);
     mvwprintw(registerWindow, 3, 1, "DE: 0x%.4X", registers[2]);
     mvwprintw(registerWindow, 4, 1, "HL: 0x%.4X", registers[3]);
     mvwprintw(registerWindow, 5, 1, "SP: 0x%.4X", registers[4]);
     mvwprintw(registerWindow, 6, 1, "PC: 0x%.4X", registers[5]);
+    // flags
+    mvwprintw(registerWindow, 1, 13, "Z: %d", (registers[0] >> 7) & 1);
+    mvwprintw(registerWindow, 2, 13, "N: %d", (registers[0] >> 6) & 1);
+    mvwprintw(registerWindow, 3, 13, "H: %d", (registers[0] >> 5) & 1);
+    mvwprintw(registerWindow, 4, 13, "C: %d", (registers[0] >> 4) & 1);
     wrefresh(registerWindow);
 
     // currently executed code
     mvwprintw(pcWindow, 0, 0, "program");
-    for(char i = -54; i < 54; i += 2) {
-        if (i == 0) {
-            mvwprintw(pcWindow, 28, 1, "->");
-        }
-        mvwprintw(pcWindow, (i/2) + 28, 4, "%.3X %.2X%.2X", pc + i, memory[pc + i], memory[pc + i + 1]);
-    }
+    mvwprintw(pcWindow, 1, 1, "-> %.3X %.2X%.2X%.2X%.2X", pc, memory[pc], memory[pc + 1], memory[pc + 2], memory[pc + 3]);
     wrefresh(pcWindow);
 }
 #endif

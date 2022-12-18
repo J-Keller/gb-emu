@@ -159,7 +159,7 @@ uint8_t CPU::readImmediate8BitData(uint16_t &programCounter) {
 uint16_t CPU::readImmediate16BitData(uint16_t &programCounter) {
     uint16_t a = readInstruction(programCounter);
     uint8_t b = readInstruction(programCounter);
-    return (a << 8) | b;
+    return (b << 8) | a;
 }
 
 // TODO: check if signed returns cause problems with unsigned readInstruction
@@ -220,9 +220,20 @@ uint8_t CPU::executeInstruction() {
         case 0x0B:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
-        case 0x0C:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0x0C: // inc C
+            result = readRegister(bc, LOW) + 1;
+            if (result == 0) {
+                writeFlag(Z, true);
+            } else {
+                writeFlag(Z, false);
+            }
+            writeFlag(N, false);
+            if ((result & 0x10) == 0x10) {
+                writeFlag(H, true);
+            } else {
+                writeFlag(H, false);
+            }
+            return 4;
         case 0x0D:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
@@ -239,9 +250,9 @@ uint8_t CPU::executeInstruction() {
                 // TODO: throw exception
             }
             return 4;
-        case 0x11:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0x11: // ld DE,d16
+            de = readImmediate16BitData(pc);
+            return 12;
         case 0x12: // ld (DE),A
             writeByteToMemory(readRegister(af, HIGH), de);
             return 8;
@@ -553,9 +564,9 @@ uint8_t CPU::executeInstruction() {
         case 0x76: // halt
             // TODO: halt
             return 4;
-        case 0x77:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0x77: // ld (HL),A
+            writeByteToMemory(readRegister(af, HIGH), hl);
+            return 8;
         case 0x78:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
@@ -816,9 +827,11 @@ uint8_t CPU::executeInstruction() {
         case 0xCC:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
-        case 0xCD:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0xCD: // call a16
+            sp -= 2;
+            writeByteToMemory(pc + 2, sp); // TODO: check if pc + 2 is correct
+            pc = readImmediate16BitData(pc);
+            return 24;
         case 0xCE:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;

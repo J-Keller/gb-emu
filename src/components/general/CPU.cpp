@@ -328,9 +328,12 @@ uint8_t CPU::executeInstruction() {
         case 0x22: // ldi (HL),A
             writeByteToMemory(readRegister(af, HIGH), hl++);
             return 8;
-        case 0x23:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0x23: // inc HL
+            result = readRegister(hl, LOW) + 1;
+            setZFlagByResult(result);
+            writeFlag(N, false);
+            setHFlagByResult(result);
+            return 4;
         case 0x24:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
@@ -437,9 +440,9 @@ uint8_t CPU::executeInstruction() {
         case 0x46:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
-        case 0x47:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0x47: // ld B,A
+            writeRegister(bc, readRegister(af, HIGH), HIGH);
+            return 4;
         case 0x48:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
@@ -838,9 +841,10 @@ uint8_t CPU::executeInstruction() {
         case 0xC8:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
-        case 0xC9:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0xC9: // ret
+            pc = readByteFromMemory(sp);
+            sp += 2;
+            return 16;
         case 0xCA:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
@@ -974,9 +978,10 @@ uint8_t CPU::executeInstruction() {
         case 0xF4:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
-        case 0xF5:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0xF5: // push AF
+            sp -= 2;
+            writeByteToMemory(af, sp);
+            return 16;
         case 0xF6:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;

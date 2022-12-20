@@ -202,9 +202,9 @@ uint8_t CPU::executeInstruction() {
         case 0x05:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
-        case 0x06:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0x06: // ld B,d8
+            writeRegister(bc, readImmediate8BitData(pc), HIGH);
+            return 8;
         case 0x07:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
@@ -268,9 +268,16 @@ uint8_t CPU::executeInstruction() {
         case 0x16:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
-        case 0x17:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0x17: // rla
+            tmp1 = readRegister(af, HIGH);
+            tmp2 = readFlag(C);
+            writeFlag(C, (tmp1 >> 8) & 1);
+            writeRegister(af, (tmp1 << 1) | tmp2, LOW);
+
+            writeFlag(Z, false);
+            writeFlag(N, false);
+            writeFlag(H, false);
+            return 8;
         case 0x18:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
@@ -441,9 +448,9 @@ uint8_t CPU::executeInstruction() {
         case 0x4E:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
-        case 0x4F:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0x4F: // ld C,A
+            writeRegister(bc, readRegister(af, HIGH), LOW);
+            return 4;
 
         case 0x50:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
@@ -792,9 +799,10 @@ uint8_t CPU::executeInstruction() {
         case 0xC0:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
-        case 0xC1:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0xC1: // pop BC
+            bc = readByteFromMemory(sp);
+            sp += 2;
+            return 12;
         case 0xC2:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
@@ -804,9 +812,10 @@ uint8_t CPU::executeInstruction() {
         case 0xC4:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
-        case 0xC5:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0xC5: // push BC
+            sp -= 2;
+            writeByteToMemory(bc, sp);
+            return 16;
         case 0xC6:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
@@ -1056,9 +1065,19 @@ uint8_t CPU::executeCBInstruction() {
         case 0x10:
             std::cerr << "Instruction 0xCB " << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
-        case 0x11:
-            std::cerr << "Instruction 0xCB " << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0x11: // rl C
+            tmp1 = readRegister(bc, LOW);
+            tmp2 = readFlag(C);
+            writeFlag(C, (tmp1 >> 8) & 1);
+            writeRegister(bc, (tmp1 << 1) | tmp2, LOW);
+            if (readRegister(bc, LOW) == 0) {
+                writeFlag(Z, true);
+            } else {
+                writeFlag(Z, false);
+            }
+            writeFlag(N, false);
+            writeFlag(H, false);
+            return 8;
         case 0x12:
             std::cerr << "Instruction 0xCB " << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;

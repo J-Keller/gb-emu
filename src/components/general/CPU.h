@@ -54,6 +54,8 @@ private:
     static void writeRegister(uint16_t &reg, uint8_t value, BytePosition bytePos);
     bool readFlag(Flag flag) const;
     void writeFlag(Flag flag, bool value);
+    void setZFlagByResult(uint16_t resultValue);
+    void setHFlagByResult(uint16_t resultValue);
     void checkBit(uint8_t bit, uint8_t valueToCheck);
 
     // cpu functions

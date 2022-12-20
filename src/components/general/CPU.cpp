@@ -113,6 +113,22 @@ void CPU::writeFlag(Flag flag, bool value) {
     }
 }
 
+void CPU::setZFlagByResult(uint16_t resultValue) {
+    if (resultValue == 0) {
+        writeFlag(Z, true);
+    } else {
+        writeFlag(Z, false);
+    }
+}
+
+void CPU::setHFlagByResult(uint16_t resultValue) {
+    if ((resultValue & 0x10) == 0x10) {
+        writeFlag(H, true);
+    } else {
+        writeFlag(H, false);
+    }
+}
+
 void CPU::checkBit(uint8_t bit, uint8_t valueToCheck) {
     if (bit > 7) {
         return;
@@ -199,9 +215,14 @@ uint8_t CPU::executeInstruction() {
         case 0x04:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
             return 0;
-        case 0x05:
-            std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
-            return 0;
+        case 0x05: // dec B
+            result = readRegister(bc, HIGH);
+            result--;
+            writeRegister(bc, result, HIGH);
+            setZFlagByResult(result);
+            writeFlag(N, false);
+            setHFlagByResult(result);
+            return 5;
         case 0x06: // ld B,d8
             writeRegister(bc, readImmediate8BitData(pc), HIGH);
             return 8;
@@ -222,17 +243,9 @@ uint8_t CPU::executeInstruction() {
             return 0;
         case 0x0C: // inc C
             result = readRegister(bc, LOW) + 1;
-            if (result == 0) {
-                writeFlag(Z, true);
-            } else {
-                writeFlag(Z, false);
-            }
+            setZFlagByResult(result);
             writeFlag(N, false);
-            if ((result & 0x10) == 0x10) {
-                writeFlag(H, true);
-            } else {
-                writeFlag(H, false);
-            }
+            setHFlagByResult(result);
             return 4;
         case 0x0D:
             std::cerr << "Instruction 0x" << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << +instruction << " not implemented yet";
@@ -1070,11 +1083,7 @@ uint8_t CPU::executeCBInstruction() {
             tmp2 = readFlag(C);
             writeFlag(C, (tmp1 >> 8) & 1);
             writeRegister(bc, (tmp1 << 1) | tmp2, LOW);
-            if (readRegister(bc, LOW) == 0) {
-                writeFlag(Z, true);
-            } else {
-                writeFlag(Z, false);
-            }
+            setZFlagByResult(readRegister(bc, LOW));
             writeFlag(N, false);
             writeFlag(H, false);
             return 8;

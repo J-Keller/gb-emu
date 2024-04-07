@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.23)
 project(gb-emu)
 
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_FLAGS "-DDEBUG -DSTEP_MODE")
+#set(CMAKE_CXX_FLAGS "-DDEBUG -DSTEP_MODE")
 
-add_executable(gb-emu src/main.cpp src/components/video/Display.cpp src/components/video/Display.h src/components/video/VideoIO.cpp src/components/video/VideoIO.h src/components/video/VideoMemory.cpp src/components/video/VideoMemory.h src/components/general/Memory.cpp src/components/general/Memory.h src/components/general/CPU.cpp src/components/general/CPU.h)
+add_executable(gb-emu src/main.cpp src/components/video/Display.cpp src/components/video/Display.h src/components/video/VideoIO.cpp src/components/video/VideoIO.h src/components/video/VideoMemory.cpp src/components/video/VideoMemory.h src/components/general/Memory.cpp src/components/general/Memory.h src/components/general/CPU.cpp src/components/general/CPU.h src/components/video/PPU.cpp src/components/video/PPU.h src/components/general/Timer.cpp src/components/general/Timer.h)
 
 find_package(SDL2 REQUIRED)
 find_package(Threads REQUIRED)

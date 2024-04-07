@@ -88,7 +88,7 @@ Display::Display() {
 #endif
 
     SDL_Init(SDL_INIT_VIDEO);
-    window = SDL_CreateWindow("chip8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width * scale, height * scale, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("GameBoy", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width * scale, height * scale, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, 0, SDL_RENDERER_SOFTWARE);
 }
 
